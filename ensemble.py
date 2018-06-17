@@ -83,10 +83,12 @@ class ensemble:
         cop_result = np.argmax(decision,axis=0)
         return cop_result
     
-    def accuracy_score_ens (self,y_true,y_pred):
+    def accuracy_score_ens (self,X_test,y_true,y_pred):
         """
         Returns the accuracy score.
         """
+        for cl in self.clf:
+            print("accuracy score for the base classifier",cl.score(X_test,y_true))
         return accuracy_score(y_true,y_pred)
             
         
