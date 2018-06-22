@@ -18,20 +18,25 @@ class ensemble:
         theta : the copula parameter
     """
     
-    def __init__(self, clf = [], copula = None, theta = 1):
+    def __init__(self, clf = [], copula = None, theta = 0):
         
         self.clf = clf
         self.copula = copula
         self.theta = theta
         
-    def fit(self,X_train, y_train):
+    def fit(self,X_train, y_train,ind=None):
         """
         Fitting all the classifiers to the train (X_train,y_train) data.
         Returns a list of the classifiers fitted.
         """
         p = []
+        i = 0
         for cl in self.clf:
-            p.append(cl.fit(X_train,y_train))
+            if (ind == None):
+                p.append(cl.fit(X_train,y_train))
+            else:
+                p.append(cl.fit(X_train[ind[i]],y_train[ind[i]]))
+                i+=1
         return p
     
     
@@ -52,7 +57,7 @@ class ensemble:
         """
         conf_mx = []
         for i in range(len(y_pred)):
-            cm = confusion_matrix(y_true,y_pred[i])
+            cm = confusion_matrix(y_true,y_pred[i]) + 1
             conf_mx.append(cm / cm.sum(axis=1))
         return conf_mx
     
@@ -83,12 +88,13 @@ class ensemble:
         cop_result = np.argmax(decision,axis=0)
         return cop_result
     
-    def accuracy_score_ens (self,X_test,y_true,y_pred):
+    def accuracy_score_ens (self,X_test,y_true,y_pred,verbose=False):
         """
         Returns the accuracy score.
         """
-        for cl in self.clf:
-            print("accuracy score for the base classifier",cl.score(X_test,y_true))
+        if (verbose == True):
+            for cl in self.clf:
+                print("accuracy score for the base classifier",cl.score(X_test,y_true))
         return accuracy_score(y_true,y_pred)
             
         
